@@ -6,7 +6,7 @@
  */
 function forEach(array, fn) {
     for (let i=0; i<array.length; i++) {
-        fn(array[i], [i], array);
+        fn(array[i], i, array);
     }
 }
 
@@ -63,13 +63,22 @@ function deleteProperty(obj, prop) {
  */
 function hasProperty(obj, prop) {
     for (var k in obj) {
-        if (k === prop) {
+        if (obj.hasOwnProperty(prop)) {
             return true;
         }
 
         return false;
     }
 }
+// function hasProperty(obj, prop) {
+//     for (var k in obj) {
+//         if (k === prop) {
+//             return true;
+//         }
+
+//         return false;
+//     }
+// }
 
 /*
  Задача 6:
