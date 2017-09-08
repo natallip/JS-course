@@ -162,14 +162,73 @@ function deleteTextNodesRecursive(where) {
  * }
  */
 function collectDOMStat(root) {
+    var data = {
+        tags: {},
+        classes: {},
+        texts: 0
+    };
+
+    function dataStat() {
+        function dataTexts(e) {
+            for (var i = 0; i < e.children.length; i++) { 
+                if (e.children[i].textContent) {
+                    data.texts += 1;
+                } 
+                if (e.children[i]) {
+                    dataTexts(e.children[i]);
+                } 
+            }
+
+            return data.texts;
+        }
+        dataTexts(root);
+
+        function dataClasses(e) {
+            for (var i = 0; i < e.children.length; i++) { 
+                if (e.children[i].classList) {
+                    for (var j=0; j<e.children[i].classList.length; j++) {
+                        data.classes[e.children[i].classList[j]] = data.classes[e.children[i].classList[j]] || 0;
+                        if (e.children[i].classList[j]) {
+                            data.classes[e.children[i].classList[j]] = data.classes[e.children[i].classList[j]] + 1; 
+                        }
+                    }
+                } 
+                if (e.children[i]) {
+                    dataClasses(e.children[i]);
+                } 
+            }
+
+            return data.classes;
+        }
+        dataClasses(root);
+
+        function dataTags(e) {
+            for (var i = 0; i < e.children.length; i++) { 
+                data.tags[e.children[i].tagName] = data.tags[e.children[i].tagName] || 0;
+                if (e.children[i].tagName) {
+
+                    data.tags[e.children[i].tagName] = data.tags[e.children[i].tagName] + 1; 
+                } 
+                if (e.children[i]) {
+                    dataTags(e.children[i]);
+                } 
+            }
+
+            return data.tags;
+        }
+        dataTags(root);
+    }
+    dataStat(root);
+
+    return data;
 }
 
 /**
  * *** Со звездочкой ***
  * Функция должна отслеживать добавление и удаление элементов внутри элемента where
- * Как только в where добавляются или удаляются элемента,
+ * Как только в where добавляются или удаляются элементы,
  * необходимо сообщать об этом при помощи вызова функции fn со специальным аргументом
- * В качестве аргумента должен быть передан объек с двумя свойствами:
+ * В качестве аргумента должен быть передан объект с двумя свойствами:
  * - type: типа события (insert или remove)
  * - nodes: массив из удаленных или добавленных элементов (а зависимости от события)
  * Отслеживание должно работать вне зависимости от глубины создаваемых/удаляемых элементов
@@ -196,6 +255,27 @@ function collectDOMStat(root) {
  * }
  */
 function observeChildNodes(where, fn) {
+    var obj = {
+        type: '',
+        nodes: []        
+    }; 
+    var observer = new MutationObserver(callback);
+       
+    function callback(mutations) {
+        mutations.forEach(function(mutation) {
+            
+            if (mutation.removedNodes.length) {
+                obj.nodes = Array.prototype.slice.call(mutation.removedNodes);
+                obj.type = 'remove';
+            } 
+            if (mutation.addedNodes.length) {
+                obj.nodes = Array.prototype.slice.call(mutation.addedNodes);
+                obj.type = 'insert';
+            }
+            fn(obj);
+        })
+    }
+    observer.observe(where, { childList: true, subtree: true });
 }
 
 export {
