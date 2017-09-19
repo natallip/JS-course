@@ -29,10 +29,10 @@ function removeListener(eventName, target, fn) {
  * @param {Element} target - элемент, на который нужно добавить обработчик
  */
 function skipDefault(eventName, target) {
-    function fn(e) {
-        e.preventDefault();
-    }
-    target.addEventListener(eventName, fn);
+    
+    target.addEventListener(eventName, function (e) {
+        e.preventDefault()
+    })
 }
 
 /**
@@ -89,6 +89,9 @@ function once(target, fn) {
             listener();
         }
     });
+    if (!clickEvent) {
+        delete listener();
+    }
 }
 
 export {
