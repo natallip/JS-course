@@ -1,104 +1,57 @@
-/* ДЗ 5 - DOM Events */
+/* ДЗ 6.1 - Асинхронность и работа с сетью */
 
 /**
- * Функция должна добавлять обработчик fn события eventName к элементу target
+ * Функция должна создавать Promise, который должен быть resolved через seconds секунду после создания
  *
- * @param {string} eventName - имя события, на которое нужно добавить обработчик
- * @param {Element} target - элемент, на который нужно добавить обработчик
- * @param {function} fn - обработчик
+ * @param {number} seconds - количество секунд, через которое Promise должен быть resolved
+ * @return {Promise}
  */
-function addListener(eventName, target, fn) {
-    target.addEventListener(eventName, fn);
-}
-
-/**
- * Функция должна удалять обработчик fn события eventName у элемента target
- *
- * @param {string} eventName - имя события, для которого нужно удалить обработчик
- * @param {Element} target - элемент, у которого нужно удалить обработчик
- * @param {function} fn - обработчик
- */
-function removeListener(eventName, target, fn) {
-    target.removeEventListener(eventName, fn);
-}
-
-/**
- * Функция должна добавлять к target обработчик события eventName, который должен отменять действие по умолчанию
- *
- * @param {string} eventName - имя события, для которого нужно удалить обработчик
- * @param {Element} target - элемент, на который нужно добавить обработчик
- */
-function skipDefault(eventName, target) {
-    
-    target.addEventListener(eventName, function (e) {
-        e.preventDefault()
-    })
-}
-
-/**
- * Функция должна эмулировать событие click для элемента target
- *
- * @param {Element} target - элемент, на который нужно добавить обработчик
- */
-function emulateClick(target) {
-    var event = new Event('click');
-
-    target.dispatchEvent(event);
-}
-
-/**
- * Функция должна добавить такой обработчик кликов к элементу target
- * который реагирует (вызывает fn) только на клики по элементам BUTTON внутри target
- *
- * @param {Element} target - элемент, на который нужно добавить обработчик
- * @param {function} fn - функция, которую нужно вызвать при клике на элемент BUTTON внутри target
- */
-function delegate(target, fn) {
-    function listener(e) {
-        var elem = e.target;
-
-        if (elem.tagName !== 'BUTTON') {
-            return;
-        }
-        if (elem.tagName == 'BUTTON') {
-            fn();
-        }
-    }
-    target.addEventListener('click', listener);
-}
-
-/**
- * *** Со звездочкой ***
- * Функция должна добавить такой обработчик кликов к элементу target
- * который сработает только один раз и удалится
- * Постарайтесь не создавать глобальных переменных
- *
- * @param {Element} target - элемент, на который нужно добавить обработчик
- * @param {function} fn - обработчик
- */
-function once(target, fn) {
-    
-    var clickEvent = true;
-
-    function listener() {
-        fn();
-        clickEvent = false;
-    } 
-    target.addEventListener('click', function () {
-        if (clickEvent) {
-            listener();
-        }
+function delayPromise(seconds) {
+    return new Promise((resolve) => {        
+        setTimeout(() => {
+            resolve();
+        }, seconds*1000);
     });
-    if (!clickEvent) {
-        delete listener();
-    }
+}
+
+/**
+ * Функция должна вернуть Promise, который должен быть разрешен массивом городов, загруженным из
+ * https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json
+ * Элементы полученного массива должны быть отсортированы по имени города
+ *
+ * @return {Promise<Array<{name: String}>>}
+ */
+function loadAndSortTowns() {
+    var promise = new Promise((resolve) => {
+        var url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
+        var xhr = new XMLHttpRequest();
+
+        xhr.open('GET', url);
+        xhr.send();
+        xhr.addEventListener('load', () => {
+            resolve(xhr.response);
+        });
+    });
+
+    return promise
+        .then((response) => {
+            var cities = JSON.parse(response);
+            var arr= [];
+
+            for (let i=0; i<cities.length; i++) {
+                
+                arr[i] = cities[i];
+            }
+            
+            return arr.sort(function(obj1, obj2) {
+                if (obj1.name > obj2.name) return 1;
+                if (obj1.name < obj2.name) return -1;
+                return 0;
+            });
+        });
 }
 
 export {
-    addListener,
-    removeListener,
-    skipDefault,
-    emulateClick,
-    delegate,
-    once
+    delayPromise,
+    loadAndSortTowns
 };
