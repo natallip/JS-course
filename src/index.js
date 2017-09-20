@@ -58,8 +58,8 @@ function prepend(what, where) {
 function findAllPSiblings(where) {
     var result = [];
         
-    for (var i = 0; i < (where.children.length-1); i++) {
-                
+    for (var i = 0; i < (where.children.length-1); i++) {  // не беру последнего ребенка, он точно не попадет в результат
+            
         if (where.children[i].nextElementSibling.tagName === 'P') {
             result.push(where.children[i]); 
         } 
@@ -101,13 +101,23 @@ function findError(where) {
  */
 function deleteTextNodes(where) {
     
-    for (var i = 0; i < where.childNodes.length; i++) {
-        if (where.childNodes[i].nodeType == 3) {
-            where.removeChild(where.childNodes[i]);
+    var array = Array.prototype.slice.call(where.childNodes);
+
+    for (var i = 0; i < array.length; i++) {
+        if (array[i].nodeType == 3) {
+            where.removeChild(array[i]);
         } 
     }
 
     return where;
+
+    // for (var i = 0; i < where.childNodes.length; i++) {
+    //     if (where.childNodes[i].nodeType == 3) {
+    //         where.removeChild(where.childNodes[i]);
+    //     } 
+    // }
+
+    // return where;
 }
 
 /**
