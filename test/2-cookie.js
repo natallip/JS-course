@@ -146,121 +146,121 @@ describe('ДЗ 7.2 - Cookie editor', () => {
             assert.lengthOf(listTable.children, 0, 'cookie не удалена из таблицы');
         });
 
-        // describe('Фильтрация', () => {
-        //     it('выводить список cookie, имя или значение которых соответствует фильтру', () => {
-        //         addNameInput.value = 'test-cookie-name-1';
-        //         addValueInput.value = 'test-cookie-value-1';
-        //         addButton.click();
+        describe('Фильтрация', () => {
+            it('выводить список cookie, имя или значение которых соответствует фильтру', () => {
+                addNameInput.value = 'test-cookie-name-1';
+                addValueInput.value = 'test-cookie-value-1';
+                addButton.click();
 
-        //         addNameInput.value = 'test-cookie-name-2';
-        //         addValueInput.value = 'test-cookie-value-2';
-        //         addButton.click();
+                addNameInput.value = 'test-cookie-name-2';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-        //         filterNameInput.value = 'test-cookie';
-        //         filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-        //         assert.lengthOf(listTable.children, 2);
+                filterNameInput.value = 'test-cookie';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 2);
 
-        //         filterNameInput.value = 'name-1';
-        //         filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-        //         assert.lengthOf(listTable.children, 1);
+                filterNameInput.value = 'name-1';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 1);
 
-        //         filterNameInput.value = 'name-2';
-        //         filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-        //         assert.lengthOf(listTable.children, 1);
-        //     });
+                filterNameInput.value = 'name-2';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 1);
+            });
 
-            // it('добавлять cookie в таблицу, только если имя cookie соответствует фильтру', () => {
-            //     let cookies;
+            it('добавлять cookie в таблицу, только если имя cookie соответствует фильтру', () => {
+                let cookies;
 
-            //     addNameInput.value = 'test-cookie-name-1';
-            //     addValueInput.value = 'test-cookie-value-1';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-1';
+                addValueInput.value = 'test-cookie-value-1';
+                addButton.click();
 
-            //     addNameInput.value = 'test-cookie-name-2';
-            //     addValueInput.value = 'test-cookie-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-2';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-            //     filterNameInput.value = 'value-2';
-            //     filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-            //     assert.lengthOf(listTable.children, 1);
+                filterNameInput.value = 'value-2';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 1);
 
-            //     addNameInput.value = 'test-cookie-name-3';
-            //     addValueInput.value = 'test-cookie-more-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-3';
+                addValueInput.value = 'test-cookie-more-value-2';
+                addButton.click();
 
-            //     cookies = getCookies();
-            //     assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
-            //     assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
-            //     assert.lengthOf(listTable.children, 2, 'должна быть в таблице т.к. соответствует фильтру');
-            // });
+                cookies = getCookies();
+                assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
+                assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
+                assert.lengthOf(listTable.children, 2, 'должна быть в таблице т.к. соответствует фильтру');
+            });
 
-            // it('не добавлять cookie в таблицу, если имя cookie не соответствует фильтру', () => {
-            //     let cookies;
+            it('не добавлять cookie в таблицу, если имя cookie не соответствует фильтру', () => {
+                let cookies;
 
-            //     addNameInput.value = 'test-cookie-name-1';
-            //     addValueInput.value = 'test-cookie-value-1';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-1';
+                addValueInput.value = 'test-cookie-value-1';
+                addButton.click();
 
-            //     addNameInput.value = 'test-cookie-name-2';
-            //     addValueInput.value = 'test-cookie-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-2';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-            //     filterNameInput.value = 'value-2';
-            //     filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-            //     assert.lengthOf(listTable.children, 1);
+                filterNameInput.value = 'value-2';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 1);
 
-            //     addNameInput.value = 'test-cookie-name-3';
-            //     addValueInput.value = 'test-cookie-value-3';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-3';
+                addValueInput.value = 'test-cookie-value-3';
+                addButton.click();
 
-            //     cookies = getCookies();
-            //     assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
-            //     assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
-            //     assert.lengthOf(listTable.children, 1, 'не должна быть в таблице т.к. не соответствует фильтру');
-            // });
+                cookies = getCookies();
+                assert(cookies.hasOwnProperty(addNameInput.value), 'должна быть добавлена в браузер');
+                assert.equal(cookies[addNameInput.value], addValueInput.value, 'должна быть добавлена в браузер');
+                assert.lengthOf(listTable.children, 1, 'не должна быть в таблице т.к. не соответствует фильтру');
+            });
 
-            // it('удалить cookie из табилицы, если ее значение перестало соответствовать фильтр', () => {
-            //     let cookies;
+            it('удалить cookie из табилицы, если ее значение перестало соответствовать фильтр', () => {
+                let cookies;
 
-            //     addNameInput.value = 'test-cookie-name-1';
-            //     addValueInput.value = 'test-cookie-value-1';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-1';
+                addValueInput.value = 'test-cookie-value-1';
+                addButton.click();
 
-            //     addNameInput.value = 'test-cookie-name-2';
-            //     addValueInput.value = 'test-cookie-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-2';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-            //     addNameInput.value = 'test-cookie-name-3';
-            //     addValueInput.value = 'test-cookie-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-3';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-            //     filterNameInput.value = 'value-2';
-            //     filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-            //     assert.lengthOf(listTable.children, 2);
+                filterNameInput.value = 'value-2';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 2);
 
-            //     addNameInput.value = 'test-cookie-name-3';
-            //     addValueInput.value = 'test-cookie-value-3';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-3';
+                addValueInput.value = 'test-cookie-value-3';
+                addButton.click();
 
-            //     cookies = getCookies();
-            //     assert(cookies.hasOwnProperty(addNameInput.value), 'должна оставться в браузере');
-            //     assert.equal(cookies[addNameInput.value], addValueInput.value, 'значение в браузере должно измениться');
-            //     assert.lengthOf(listTable.children, 1, 'уже не соответствует фильтру и не должна быть в таблице');
-            // });
+                cookies = getCookies();
+                assert(cookies.hasOwnProperty(addNameInput.value), 'должна оставться в браузере');
+                assert.equal(cookies[addNameInput.value], addValueInput.value, 'значение в браузере должно измениться');
+                assert.lengthOf(listTable.children, 1, 'уже не соответствует фильтру и не должна быть в таблице');
+            });
 
-            // it('выводить все cookie, если фильтр не задал', () => {
-            //     addNameInput.value = 'test-cookie-name-1';
-            //     addValueInput.value = 'test-cookie-value-1';
-            //     addButton.click();
+            it('выводить все cookie, если фильтр не задал', () => {
+                addNameInput.value = 'test-cookie-name-1';
+                addValueInput.value = 'test-cookie-value-1';
+                addButton.click();
 
-            //     addNameInput.value = 'test-cookie-name-2';
-            //     addValueInput.value = 'test-cookie-value-2';
-            //     addButton.click();
+                addNameInput.value = 'test-cookie-name-2';
+                addValueInput.value = 'test-cookie-value-2';
+                addButton.click();
 
-            //     filterNameInput.value = '';
-            //     filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
-            //     assert.lengthOf(listTable.children, 2);
-            // });
-        // });
+                filterNameInput.value = '';
+                filterNameInput.dispatchEvent(new KeyboardEvent('keyup'));
+                assert.lengthOf(listTable.children, 2);
+            });
+        });
     });
 });
