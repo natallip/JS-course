@@ -36,14 +36,8 @@ function loadAndSortTowns() {
     return promise
         .then((response) => {
             var cities = JSON.parse(response);
-            var arr= [];
-
-            for (let i=0; i<cities.length; i++) {
-                
-                arr[i] = cities[i];
-            }
-            
-            return arr.sort(function(obj1, obj2) {
+                        
+            return cities.sort(function(obj1, obj2) {
                 if (obj1.name > obj2.name) return 1;
                 if (obj1.name < obj2.name) return -1;
                 return 0;
@@ -55,3 +49,5 @@ export {
     delayPromise,
     loadAndSortTowns
 };
+
+

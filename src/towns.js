@@ -27,6 +27,7 @@
  * @example
  * homeworkContainer.appendChild(...);
  */
+import { loadAndSortTowns } from '../src/index';
 let homeworkContainer = document.querySelector('#homework-container');
 
 /**
@@ -37,33 +38,7 @@ let homeworkContainer = document.querySelector('#homework-container');
  */
 
 function loadTowns() {
-    var promise = new Promise((resolve) => {
-        var url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
-        var xhr = new XMLHttpRequest();
-
-        xhr.open('GET', url);
-        xhr.send();
-        xhr.addEventListener('load', () => {
-            resolve(xhr.response);
-        });
-    });
-
-    return promise
-        .then((response) => {
-            var cities = JSON.parse(response);
-            var arr= [];
-
-            for (let i=0; i<cities.length; i++) {
-                
-                arr[i] = cities[i];
-            }
-            
-            return arr.sort(function(obj1, obj2) {
-                if (obj1.name > obj2.name) return 1;
-                if (obj1.name < obj2.name) return -1;
-                return 0;
-            });
-        });
+    return loadAndSortTowns();
 }
 /**
  * Функция должна проверять встречается ли подстрока chunk в строке full
@@ -93,11 +68,12 @@ let filterBlock = homeworkContainer.querySelector('#filter-block');
 let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
 var btn = document.createElement('BUTTON');
+
 btn.setAttribute('id', 'button');
 let substring = '';
 var result = [];
 
-function loadAndSortTowns() {
+function SortTowns() {
     var townsPromise = new Promise((resolve) => {        
         var url = 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json';
         var xhr = new XMLHttpRequest();
@@ -117,7 +93,7 @@ function loadAndSortTowns() {
                 btn.setAttribute('value', 'Повторить');
                 btn.addEventListener('click', () => {
                     btn.style.display = 'none';
-                    loadAndSortTowns();  
+                    SortTowns();  
                 })
             }
         });
@@ -140,7 +116,7 @@ function loadAndSortTowns() {
         })
 }    
 
-loadAndSortTowns();
+SortTowns();
 
 filterInput.addEventListener('keyup', function() {
     substring = filterInput.value;
