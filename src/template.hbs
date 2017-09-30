@@ -1,0 +1,9 @@
+<script id="user-template"> 
+    <div>
+        <div><b>Список пользователей:</b></div>
+            {{#each list}}
+            <div>{{first_name}} {{last_name}}</div>
+            <img src="{{photo_100}}">
+            {{/each}}
+    </div>
+</script>
