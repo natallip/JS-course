@@ -1,251 +1,237 @@
-var listAll = document.querySelector('.list-all');
-var listSelect = document.querySelector('.list-select');
+ymaps.ready(init);
 
-function api(method, params) {
-    return new Promise((resolve, reject) => {
-        VK.api(method, params, data => {
-            if (data.error) {
-                reject(new Error(data.error.error_msg));
-            } else {
-                resolve(data.response);
-            }
+function init() {
+    var myMap;
+    var myPlacemark;
+    var placemarks = [];
+    var clusterer;
+    var customItemContentLayout;
+    var coords;
+    var address;
+    var name, place, text, now, options, blockReviews;
+    var firstGeoObject;
+    var time = [];
+    var balloonLayout;
+    var data;
+    var index = 0;
+       
+    myMap = new ymaps.Map('map', {
+        center: [55.753994, 37.622093],
+        zoom: 11
+    });
+
+    ymaps.geolocation.get({
+        provider: 'browser',
+        mapStateAutoApply: true
+    }).then(function (result) {
+        myMap.geoObjects.add(result.geoObjects);
+    });
+
+    function openBalloon(e) {
+        coords = e.get('coords');
+        
+        ymaps.geocode(coords).then(function (res) {
+            var firstGeoObject = res.geoObjects.get(0).getAddressLine();
+            address = document.querySelector('.place__title');
+            address.innerHTML = firstGeoObject;
         });
-    });
-}
-
-const promise = new Promise((resolve, reject) => {
-    VK.init({
-        apiId: 6196199
-    });
-
-    VK.Auth.login(data => {
-        if (data.session) {
-            resolve(data);
-        } else {
-            reject(new Error('Не удалось авторизоваться'));
-        }
-    }, 16);
-});
-
-promise
-    .then(() => {
-        return api('users.get', { v: 5.68, name_case: 'gen' });
-    })
-    .then(data => {
-        return api('friends.get', { v: 5.68, fields: 'first_name, last_name, photo_100' })
-    })
-    .then(data => {
-        if (localStorage.all && localStorage.select) {
-            var objAll = JSON.parse(localStorage.all);
-            var objSel = JSON.parse(localStorage.select);
-
-            for (let key in objAll) {
-                let item = document.createElement('LI');               
-
-                item.innerHTML = objAll[key];
-                item.setAttribute('draggable', 'true');
-                item.className = 'item';
-                listAll.appendChild(item);
-            }
-            for (let key in objSel) {
-                let item = document.createElement('LI');
-
-                item.innerHTML = objSel[key];
-                item.setAttribute('draggable', 'true');
-                item.className = 'item-select';
-                listSelect.appendChild(item);
-            }
-        } else {
-            function addFriend() {
-                for (let i=0; i<data.count; i++) {
-                    let item = document.createElement('LI');
-                    let friend = data.items[i];
-
-                    item.className = 'item';
-                    item.innerHTML = `<img class="item-photo" src=${friend.photo_100}><div class="item-text">${friend.first_name} ${friend.last_name}</div><div class="btn-plus">&#10133;</div>`;
-                    item.setAttribute('draggable', 'true');
-                    listAll.appendChild(item);
-                }
-            }
-
-            return addFriend();
-        }
-    })
-    .catch(function (e) {
-        alert('Ошибка: ' + e.message);
-    });    
-
-listAll.addEventListener('click', function(e) {
-    var target = e.target;
-    var item = target.parentElement;
-            
-    if (!target.classList.contains('btn-plus')) {
-        return;                
+       
+    var myBalloon = myMap.balloon.open(coords, {
+        contentHeader: '<div class="block">' +
+            '<div class="block__place">' + 
+            '<div class="place__title"></div>' +
+            '<div class="place__close">&#10133;</div></div>',
+        contentBody: '<div class="block__reviews"></div>',
+        contentFooter: '<div class="review">' +
+            '<div class="title">Ваш отзыв</div>' +
+            '<input type="text" class="text" id="name" placeholder="Ваше'+'&ensp;'+'имя">' +
+            '<input type="text" class="text" id="place" placeholder="Укажите'+'&ensp;'+'место">' +
+            '<textarea name="review" id="text" class="textarea" placeholder="Поделитесь'+'&ensp;'+'впечатлениями"></textarea>'+
+            '</div>' +
+            '<div class="block__btn"><button class="add-comment">Добавить</button></div>' +
+            '</div>'
+        }, {
+            closeButton: false
+        });
     }
-    target.classList.remove('btn-plus');
-    target.classList.add('btn-minus');
-    //listAll.removeChild(item);
-    listSelect.appendChild(item);
-    item.classList.remove('item');
-    item.classList.add('item-select');
-})
-listSelect.addEventListener('click', function(e) {
-    var target = e.target;
-    var item = target.parentElement;
-            
-    if (target.classList.contains('btn-minus')) {
-        target.classList.remove('btn-minus');
-        target.classList.add('btn-plus');
-        //listSelect.removeChild(item);
-        listAll.appendChild(item);
-        item.classList.remove('item-select');
-        item.classList.add('item');
-
-    }
-})
-// DnD ////////////////////////////////////
-listAll.addEventListener('dragstart', function(e) {
-    if (!e.target.classList.contains('item')) {
-        return;                
-    }
-    e.target.setAttribute('id', 'dnd');
-    e.target.setAttribute('class', 'item-select');
-    e.dataTransfer.effectAllowed='move';
-    e.dataTransfer.setData('Text', e.target.id); 
-                       
-    return true;
-})
-listAll.addEventListener('dragover', function(e) {
-    if (!e.target.classList.contains('item')) {
-        return;                
-    }
-    e.preventDefault();
-})
-        
-listSelect.addEventListener('dragover', function (e) {
-    e.preventDefault();
-
-    return false;
-})
-listSelect.addEventListener('drop', function (e) {
-    var data = e.dataTransfer.getData('Text');
-    var itemMoved = document.getElementById(data);
-
-    if (e.target.parentElement.classList.contains('item-select')) {
-        listSelect.appendChild(itemMoved);
-        itemMoved.setAttribute('class', 'item-select');
-        itemMoved.lastChild.classList.remove('btn-plus'); 
-        itemMoved.lastChild.classList.add('btn-minus'); 
-        return;                
-    }
-    e.target.appendChild(itemMoved);
-    itemMoved.setAttribute('class', 'item-select');
-    itemMoved.lastChild.classList.remove('btn-plus');
-    itemMoved.lastChild.classList.add('btn-minus');
-    e.stopPropagation();
-    e.dataTransfer.dropEffect='move';
-    return false;
-})
-
-//            LocalStorage                ////////////////////////////
-var save = document.querySelector('#btn-save');
-
-save.addEventListener('click', function() {
-    var allSaved = document.querySelector('.list-all').children;
-    var selectSaved = document.querySelector('.list-select').children;
-    var obj1 = {};
-    var obj2 = {};
-
-    for (let i=0; i<allSaved.length; i++) {
-        obj1[i] = allSaved[i].innerHTML;
-    }
-    for (let i=0; i<selectSaved.length; i++) {
-        obj2[i] = selectSaved[i].innerHTML;
-    }
-    localStorage.all = JSON.stringify(obj1);
-    localStorage.select = JSON.stringify(obj2);
-})
-
-// //              Filter             /////////////////////////////
-var filterInput = document.querySelector('#filter');
-var filterSelected = document.querySelector('#filter-selected');
-var substring = '';
-var name = [];
-        
-function isMatching(full, chunk) {
-    full = full.toLowerCase();
-    chunk = chunk.toLowerCase();
-    if (full.indexOf(chunk) === 0) {
-        return true;
-    }
-
-    return false;
-}
-
-function getFullName(ul) {
-    for (let i=0; i<ul.length; i++) {
-        name[i] = ul[i].textContent.split(' ');
-    }
-
-    return name;
-}
-var cListAll = document.createElement('UL');
-var wrapper = document.querySelector('.wrapper');
-
-wrapper.appendChild(cListAll);                   
-cListAll.setAttribute('class', 'all');
-cListAll.style.display = 'none';
-
-function handlerAll(e) {
-    var liAll = document.querySelectorAll('.item'); 
-    var fullNameAll = getFullName(listAll.querySelectorAll('.item-text'));
-
-    substring = e.target.value;
     
-    for (let i=0; i<liAll.length; i++) {
-        if (listAll.children[0]) {
-        cListAll.appendChild(listAll.children[0]);
+    myMap.events.add('click', function (e) {
+        if (!myMap.balloon.isOpen(e)) {
+            openBalloon(e); 
         }
+        else {
+            myMap.balloon.close();
+        }
+    });
+    
+    myMap.events.add('balloonopen', function (e) {    
+        myMap.hint.close();
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('place__close')) {
+            return;                
+        }
+        var balloon = document.querySelector('.ymaps-2-1-55-balloon__content');
+        balloon.style.display = 'none'; 
+    })
+
+    function createPlacemark(coords) {
+        return new ymaps.Placemark(coords, {
+        }, {
+            preset: 'islands#violetDotIconWithCaption'
+        });
     }
-    for (let i=0; i<liAll.length; i++) {
-        if (substring !== '') {
-            
-            if (isMatching(fullNameAll[i][0], substring) || isMatching(fullNameAll[i][1], substring)) {
-                listAll.appendChild(liAll[i]);
-            } 
-        } else {
-            listAll.appendChild(liAll[i]);
-        } 
+                    
+    function getAddress(coords) {   // Определяем адрес по координатам (обратное геокодирование).
+        ymaps.geocode(coords).then(function (res) {
+            firstGeoObject = res.geoObjects.get(0).getAddressLine();
+                                                                           
+            myPlacemark.properties     
+                .set({   
+                    balloonContentHeader: `<div class="hidden link">${firstGeoObject}</div>`,
+                    balloonContentFooter: `<div class="block"> 
+                    <div class="block__place"> 
+                    <div class="place__title">${firstGeoObject}</div>
+                    <div class="place__close">&#10133;</div></div>
+                    <div class="block__reviews">${blockReviews.innerHTML}</div>` +
+                    '<div class="review">' +
+                    '<div class="title">Ваш отзыв</div>' +
+                    '<input type="text" class="text" id="name" placeholder="Ваше'+'&ensp;'+'имя">' +
+                    '<input type="text" class="text" id="place" placeholder="Укажите'+'&ensp;'+'место">' +
+                    '<textarea name="review" id="text" class="textarea" placeholder="Поделитесь'+'&ensp;'+'впечатлениями"></textarea>'+
+                    '</div>' +
+                    '<div class="block__btn"><button class="add-comment">Добавить</button></div>' +
+                    '</div>'
+                });
+           
+        });
     }
-}
-var cListS = document.createElement('UL');
 
-wrapper.appendChild(cListS);                   
-cListS.setAttribute('class', 'select');
-cListS.style.display = 'none';
+    customItemContentLayout = ymaps.templateLayoutFactory.createClass(
+        '<div class=balloon_header>{{ properties.balloonContentHeader|raw }}</div>' +
+        '<div class=balloon_body>{{ properties.balloonContentBody|raw }}</div>'
+    );
+               
+    clusterer = new ymaps.Clusterer({
+        clusterDisableClickZoom: true,
+        geoObjectHideIconOnBalloonOpen: false, 
+        clusterOpenBalloonOnClick: true,
+        clusterBalloonContentLayout: 'cluster#balloonCarousel',
+        clusterBalloonItemContentLayout: customItemContentLayout,
+        clusterBalloonPanelMaxMapArea: 0,
+        clusterBalloonContentLayoutWidth: 200,
+        clusterBalloonContentLayoutHeight: 130,
+        clusterBalloonPagerSize: 5,
+        clusterHideIconOnBalloonOpen: false,
+        preset: 'islands#violetClusterIcons',
+        groupByCoordinates: false
+    });
 
-function handlerSelect(e) {
-    var liS = document.querySelectorAll('.item-select');     
-    var fullNameS = getFullName(listSelect.querySelectorAll('.item-text'));  
+    function appendReview() {
+        balloonLayout = document.querySelector('.ymaps-2-1-55-balloon__layout');
+        blockReviews = document.querySelector('.block__reviews'); 
+        name = document.querySelector('#name'); 
+        place = document.querySelector('#place');
+        text = document.querySelector('#text');
+        now = new Date();
+        options = {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric'
+        };
 
-    substring = e.target.value;
+        var review = document.createElement('DIV'); 
+        var reviewInfo = document.createElement('DIV');
+        var reviewText = document.createElement('DIV');
+                
+        review.setAttribute('class', 'review');
+        reviewInfo.innerHTML = `<b>${name.value}</b>  ${place.value}  ${now.toLocaleString("ru", options)}`;
+        reviewText.innerHTML = text.value;
+        review.appendChild(reviewInfo);
+        review.appendChild(reviewText);
+        blockReviews.appendChild(review);
+        time.push(now.toLocaleString('ru', options));
+    }
         
-    for (let i=0; i<liS.length; i++) {
-        if (listSelect.children[0]) {
-            cListS.appendChild(listSelect.children[0]);
+    if (!localStorage.data) {
+        data = {};
+        index = 0;
+    } else {
+        data = JSON.parse(localStorage.data);
+        index =  Object.keys(data).length;
+    }
+    if (localStorage.data) {
+        var dataForPlacemarks = JSON.parse(localStorage.data);
+                 
+        for (let key in dataForPlacemarks) {
+            var adrs = dataForPlacemarks[key].ad;
+            
+            var place = document.createElement('DIV'); 
+            place.setAttribute('value', dataForPlacemarks[key].place);
+            var text = document.createElement('DIV'); 
+            text.setAttribute('value', dataForPlacemarks[key].text);
+            var now = document.createElement('DIV'); 
+            now.setAttribute('value', dataForPlacemarks[key].time);
+            var name = document.createElement('DIV'); 
+            name.setAttribute('value', dataForPlacemarks[key].name);
+
+            myPlacemark = createPlacemark(adrs);
+            getAddress(adrs);
+            placemarks.push(myPlacemark);
+            clusterer.add(placemarks); 
+            myMap.geoObjects.add(clusterer); 
+           
         }
     }
-  
-    for (let i=0; i<liS.length; i++) {
-        if (substring !== '') {
-            
-            if (isMatching(fullNameS[i][0], substring) || isMatching(fullNameS[i][1], substring)) {
-                listSelect.appendChild(liS[i]);     
-            } 
-        } else {
-            listSelect.appendChild(liS[i]);
-        } 
-    }
+     
+    document.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('add-comment')) {
+            return;                
+        }
+        appendReview();
+        myPlacemark = createPlacemark(coords);
+        getAddress(coords);
+        myPlacemark.properties      
+           .set({   
+               balloonContentBody: `<div class="hidden">${place.value}<br>${text.value}<br>${now.toLocaleString('ru', options)}</div>`
+           });
+       
+        data[index] = {
+            place: place.value,
+            name: name.value,
+            text: text.value,
+            time: now.toLocaleString('ru', options),
+            ad: coords
+        }   
+        index++;
+             
+        placemarks.push(myPlacemark);
+           
+        localStorage.data = JSON.stringify(data);
+
+        myPlacemark.events.add('balloonopen', function (e) {
+            coords = e.originalEvent.currentTarget.geometry._coordinates;
+
+            return function getAddress(coords) {
+                ymaps.geocode(coords).then(function (res) {
+                    return firstGeoObject = res.geoObjects.get(0).getAddressLine();
+                });
+            }
+        })
+
+        clusterer.add(placemarks); 
+        myMap.geoObjects.add(clusterer);
+        
+        name.value = '';
+        place.value = '';
+        text.value = '';
+    })  
 }
-filterInput.addEventListener('keyup', handlerAll);
-filterSelected.addEventListener('keyup', handlerSelect);
+
+// https://tech.yandex.ru/maps/jsbox/2.1/cluster_balloon_carousel
+// https://tech.yandex.ru/maps/jsbox/2.1/clusterer_create
+// https://tech.yandex.ru/maps/jsbox/2.1/object_manager_balloon
