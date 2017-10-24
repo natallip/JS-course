@@ -70,10 +70,10 @@ ul {
     border-radius:  12px;
     justify-content: space-between;
 }
-.ymaps-2-1-55-balloon-content__header {
+.ymaps-2-1-56-balloon-content__header {
     overflow-y: hidden;
 }
-.ymaps-2-1-55-balloon__layout .ymaps-2-1-55-balloon__content {
+.ymaps-2-1-56-balloon__layout .ymaps-2-1-56-balloon__content {
     padding: 0; 
     margin: 0;
     overflow-y: hidden;
@@ -203,7 +203,7 @@ ul {
     display: flex;
     justify-content: flex-end;
 }
-.ymaps-2-1-55-b-cluster-carousel__content-item .balloon_header {
+.ymaps-2-1-56-b-cluster-carousel__content-item .balloon_header {
     /* padding: 8px;
     color: blue;
     text-decoration: underline;
@@ -211,13 +211,13 @@ ul {
     display: block;
     padding-top: 5px;
 }
-.ymaps-2-1-55-b-cluster-carousel__content-item .balloon_body {
+.ymaps-2-1-56-b-cluster-carousel__content-item .balloon_body {
     /* padding: 8px;
     font-weight: normal; */
     display: block;
     padding-top: 5px;
 }
-.ymaps-2-1-55-b-cluster-carousel__content-item .balloon_footer {
+.ymaps-2-1-56-b-cluster-carousel__content-item .balloon_footer {
     padding: 8px;
     text-align: rigth;
     font-weight: normal;
@@ -229,24 +229,24 @@ ul {
     overflow: hidden;
     overflow-y: hidden;
 } */
-.ymaps-2-1-55-balloon-content__header {
+.ymaps-2-1-56-balloon-content__header {
     display: none;
 }
-.ymaps-2-1-55-map .ymaps-2-1-55-balloon__content .ymaps-2-1-55-balloon-content__header .hidden {
+.ymaps-2-1-56-map .ymaps-2-1-56-balloon__content .ymaps-2-1-56-balloon-content__header .hidden {
     display: none;
     height: 0;
     width: 0;
     overflow: hidden;
 }
-.ymaps-2-1-55-i-custom-scroll ::-webkit-scrollbar, .ymaps-2-1-55-i-custom-scroll::-webkit-scrollbar {
+.ymaps-2-1-56-i-custom-scroll ::-webkit-scrollbar, .ymaps-2-1-56-i-custom-scroll::-webkit-scrollbar {
     display: none;
 }
-.ymaps-2-1-55-balloon__close {
+.ymaps-2-1-56-balloon__close {
     display: none;
     width: 0;
     height: 0;
 }
-.ymaps-2-1-55-balloon__content .ymaps-2-1-55-balloon-content__footer {
+.ymaps-2-1-56-balloon__content .ymaps-2-1-56-balloon-content__footer {
     margin: -5px;
 }
 .link {
@@ -262,4 +262,7 @@ ymaps .balloon_header .hidden {
 }
 ymaps .balloon_body .hidden {
     display: block;
+}
+.ymaps-2-1-56-balloon__layout .ymaps-2-1-56-balloon__close+.ymaps-2-1-56-balloon__content {
+    margin-right: 0;
 }

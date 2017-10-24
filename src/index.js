@@ -1,7 +1,6 @@
 ymaps.ready(init);
 
 function init() {
-    var myMap;
     var myPlacemark;
     var placemarks = [];
     var clusterer;
@@ -14,12 +13,17 @@ function init() {
     var balloonLayout;
     var data;
     var index = 0;
+
+    data = {
+        type: 'FeatureCollection',
+        features: []
+    }
        
-    myMap = new ymaps.Map('map', {
+    var myMap = new ymaps.Map('map', {
         center: [55.753994, 37.622093],
         zoom: 11
     });
-
+    
     ymaps.geolocation.get({
         provider: 'browser',
         mapStateAutoApply: true
@@ -72,7 +76,7 @@ function init() {
         if (!e.target.classList.contains('place__close')) {
             return;                
         }
-        var balloon = document.querySelector('.ymaps-2-1-55-balloon__content');
+        var balloon = document.querySelector('.ymaps-2-1-56-balloon__content');
         balloon.style.display = 'none'; 
     })
 
@@ -129,7 +133,7 @@ function init() {
     });
 
     function appendReview() {
-        balloonLayout = document.querySelector('.ymaps-2-1-55-balloon__layout');
+        balloonLayout = document.querySelector('.ymaps-2-1-56-balloon__layout');
         blockReviews = document.querySelector('.block__reviews'); 
         name = document.querySelector('#name'); 
         place = document.querySelector('#place');
@@ -158,35 +162,46 @@ function init() {
     }
         
     if (!localStorage.data) {
-        data = {};
+        data = {
+            type: 'FeatureCollection',
+            features: []
+        }
         index = 0;
     } else {
         data = JSON.parse(localStorage.data);
-        index =  Object.keys(data).length;
+        index =  Object.keys(data.features).length;
+        
     }
     if (localStorage.data) {
         var dataForPlacemarks = JSON.parse(localStorage.data);
-                 
-        for (let key in dataForPlacemarks) {
-            var adrs = dataForPlacemarks[key].ad;
-            
-            var place = document.createElement('DIV'); 
-            place.setAttribute('value', dataForPlacemarks[key].place);
-            var text = document.createElement('DIV'); 
-            text.setAttribute('value', dataForPlacemarks[key].text);
-            var now = document.createElement('DIV'); 
-            now.setAttribute('value', dataForPlacemarks[key].time);
-            var name = document.createElement('DIV'); 
-            name.setAttribute('value', dataForPlacemarks[key].name);
+        var objectManager = new ymaps.ObjectManager({
+            clusterize: true,
+            clusterDisableClickZoom: true,
+            geoObjectHideIconOnBalloonOpen: false, 
+            clusterOpenBalloonOnClick: true,
+            clusterBalloonContentLayout: 'cluster#balloonCarousel',
+            clusterBalloonItemContentLayout: customItemContentLayout,
+            clusterBalloonPanelMaxMapArea: 0,
+            clusterBalloonContentLayoutWidth: 200,
+            clusterBalloonContentLayoutHeight: 130,
+            clusterBalloonPagerSize: 5,
+            clusterHideIconOnBalloonOpen: false,
+            preset: 'islands#violetClusterIcons',
+            groupByCoordinates: false
+        });
 
-            myPlacemark = createPlacemark(adrs);
-            getAddress(adrs);
-            placemarks.push(myPlacemark);
-            clusterer.add(placemarks); 
-            myMap.geoObjects.add(clusterer); 
-           
-        }
+        objectManager.objects.options.set('preset', 'islands#violetDotIcon');
+        objectManager.add(dataForPlacemarks);
+        myMap.geoObjects.add(objectManager);
     }
+    document.addEventListener('click', function(e) {
+        if (!e.target.classList.contains('link')) {
+            return;                
+        }
+        
+    })
+
+    //   ////////////
      
     document.addEventListener('click', function(e) {
         if (!e.target.classList.contains('add-comment')) {
@@ -200,18 +215,20 @@ function init() {
                balloonContentBody: `<div class="hidden">${place.value}<br>${text.value}<br>${now.toLocaleString('ru', options)}</div>`
            });
        
-        data[index] = {
-            place: place.value,
-            name: name.value,
-            text: text.value,
-            time: now.toLocaleString('ru', options),
-            ad: coords
+        data.features[index] = {
+            type: 'Feature',
+            id: index, 
+            geometry: 
+                { type: 'Point', coordinates: coords },
+            properties: myPlacemark.properties._data
         }   
         index++;
+
              
         placemarks.push(myPlacemark);
-           
+                   
         localStorage.data = JSON.stringify(data);
+        //console.log(data);
 
         myPlacemark.events.add('balloonopen', function (e) {
             coords = e.originalEvent.currentTarget.geometry._coordinates;
@@ -224,14 +241,26 @@ function init() {
         })
 
         clusterer.add(placemarks); 
+        //console.log(placemarks); 
+
+        
+
         myMap.geoObjects.add(clusterer);
         
         name.value = '';
         place.value = '';
         text.value = '';
     })  
+    console.log(data);
 }
 
 // https://tech.yandex.ru/maps/jsbox/2.1/cluster_balloon_carousel
 // https://tech.yandex.ru/maps/jsbox/2.1/clusterer_create
 // https://tech.yandex.ru/maps/jsbox/2.1/object_manager_balloon
+// https://tech.yandex.ru/maps/jsbox/2.1/object_manager
+// https://tech.yandex.ru/maps/jsbox/2.1/object_manager_events
+// https://tech.yandex.ru/maps/jsbox/2.1/object_manager_balloon
+
+
+
+
