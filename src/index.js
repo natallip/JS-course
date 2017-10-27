@@ -35,7 +35,7 @@ function init() {
         coords = e.get('coords');
         
         ymaps.geocode(coords).then(function (res) {
-            var firstGeoObject = res.geoObjects.get(0).getAddressLine();
+            firstGeoObject = res.geoObjects.get(0).getAddressLine();
             address = document.querySelector('.place__title');
             address.innerHTML = firstGeoObject;
         });
@@ -89,24 +89,11 @@ function init() {
                     
     function getAddress(coords) {   // Определяем адрес по координатам (обратное геокодирование).
         ymaps.geocode(coords).then(function (res) {
-            firstGeoObject = res.geoObjects.get(0).getAddressLine();
-                                                                           
+            var firstGeoObject = res.geoObjects.get(0).getAddressLine();
+                                                    
             myPlacemark.properties     
                 .set({   
-                    balloonContentHeader: `<div class="hidden link">${firstGeoObject}</div>`,
-                    balloonContentFooter: `<div class="block"> 
-                    <div class="block__place"> 
-                    <div class="place__title">${firstGeoObject}</div>
-                    <div class="place__close">&#10133;</div></div>
-                    <div class="block__reviews">${blockReviews.innerHTML}</div>` +
-                    '<div class="review">' +
-                    '<div class="title">Ваш отзыв</div>' +
-                    '<input type="text" class="text" id="name" placeholder="Ваше'+'&ensp;'+'имя">' +
-                    '<input type="text" class="text" id="place" placeholder="Укажите'+'&ensp;'+'место">' +
-                    '<textarea name="review" id="text" class="textarea" placeholder="Поделитесь'+'&ensp;'+'впечатлениями"></textarea>'+
-                    '</div>' +
-                    '<div class="block__btn"><button class="add-comment">Добавить</button></div>' +
-                    '</div>'
+                    balloonContentHeader: `<div class="hidden link">${firstGeoObject}</div>`
                 });
            
         });
@@ -194,25 +181,33 @@ function init() {
         objectManager.add(dataForPlacemarks);
         myMap.geoObjects.add(objectManager);
     }
-    document.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('link')) {
-            return;                
-        }
-        
-    })
 
-    //   ////////////
-     
-    document.addEventListener('click', function(e) {
+
+    function handler(e) {
         if (!e.target.classList.contains('add-comment')) {
             return;                
         }
         appendReview();
         myPlacemark = createPlacemark(coords);
         getAddress(coords);
+                
         myPlacemark.properties      
-           .set({   
-               balloonContentBody: `<div class="hidden">${place.value}<br>${text.value}<br>${now.toLocaleString('ru', options)}</div>`
+           .set({  
+                balloonContentHeader: `<div class="hidden link">${firstGeoObject}</div>`,
+                balloonContentFooter: `<div class="block"> 
+                    <div class="block__place"> 
+                    <div class="place__title">${firstGeoObject}</div>
+                    <div class="place__close">&#10133;</div></div>
+                    <div class="block__reviews">${blockReviews.innerHTML}</div>` +
+                    '<div class="review">' +
+                    '<div class="title">Ваш отзыв</div>' +
+                    '<input type="text" class="text" id="name" placeholder="Ваше'+'&ensp;'+'имя">' +
+                    '<input type="text" class="text" id="place" placeholder="Укажите'+'&ensp;'+'место">' +
+                    '<textarea name="review" id="text" class="textarea" placeholder="Поделитесь'+'&ensp;'+'впечатлениями"></textarea>'+
+                    '</div>' +
+                    '<div class="block__btn"><button class="add-comment">Добавить</button></div>' +
+                    '</div>',
+                balloonContentBody: `<div class="hidden">${place.value}<br>${text.value}<br>${now.toLocaleString('ru', options)}</div>`
            });
        
         data.features[index] = {
@@ -223,13 +218,11 @@ function init() {
             properties: myPlacemark.properties._data
         }   
         index++;
-
              
         placemarks.push(myPlacemark);
-                   
+                           
         localStorage.data = JSON.stringify(data);
-        //console.log(data);
-
+        
         myPlacemark.events.add('balloonopen', function (e) {
             coords = e.originalEvent.currentTarget.geometry._coordinates;
 
@@ -241,17 +234,31 @@ function init() {
         })
 
         clusterer.add(placemarks); 
-        //console.log(placemarks); 
-
-        
-
         myMap.geoObjects.add(clusterer);
         
         name.value = '';
         place.value = '';
         text.value = '';
-    })  
-    console.log(data);
+    }
+
+    document.addEventListener('click', handler);  
+    // console.log(data);
+
+    myMap.geoObjects.events.add('click', e => {
+            
+        // console.log(e);
+        let target = e.get('target');
+            // console.log(target.options._parent._name);
+
+        if (target.options._parent._name === 'objectCollection') {
+            // var a = e.originalEvent.currentTarget._map.balloon._balloon.options._data.geometry._coordinates;
+        }
+
+        if (target.options._parent._name === 'clusterCollection') {
+        }
+
+    });
+
 }
 
 // https://tech.yandex.ru/maps/jsbox/2.1/cluster_balloon_carousel
@@ -259,8 +266,3 @@ function init() {
 // https://tech.yandex.ru/maps/jsbox/2.1/object_manager_balloon
 // https://tech.yandex.ru/maps/jsbox/2.1/object_manager
 // https://tech.yandex.ru/maps/jsbox/2.1/object_manager_events
-// https://tech.yandex.ru/maps/jsbox/2.1/object_manager_balloon
-
-
-
-
